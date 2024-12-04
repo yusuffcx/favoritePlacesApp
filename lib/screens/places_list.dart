@@ -1,6 +1,7 @@
 import 'package:favorite_places/models/favorite_place.dart';
 import 'package:favorite_places/providers/places_provider.dart';
 import 'package:favorite_places/screens/new_place.dart';
+import 'package:favorite_places/screens/place_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,6 +15,11 @@ class PlacesList extends ConsumerWidget {
           .push(MaterialPageRoute(builder: (ctx) => const NewPlace()));
     }
 
+    void placeDetail(FavoritePlace place) {
+      Navigator.of(context).push(
+          MaterialPageRoute(builder: (ctx) => PlaceDetails(place: place)));
+    }
+
     List<FavoritePlace> places = ref.watch(placesProvider);
     Widget content = places.isEmpty
         ? Center(
@@ -21,13 +27,20 @@ class PlacesList extends ConsumerWidget {
             'No places added yet',
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           ))
-        : ListView.builder(
-            itemCount: places.length,
-            itemBuilder: (context, int index) {
-              return ListTile(
-                title: Text(places[index].title),
-              );
-            },
+        : InkWell(
+            child: ListView.builder(
+              itemCount: places.length,
+              itemBuilder: (context, int index) {
+                return ListTile(
+                  onTap: () {
+                    placeDetail(places[index]);
+                  },
+                  title: Text(
+                    places[index].title,
+                  ),
+                );
+              },
+            ),
           );
 
     return Scaffold(
