@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:favorite_places/models/favorite_place.dart';
 import 'package:favorite_places/providers/places_provider.dart';
 import 'package:favorite_places/screens/new_place.dart';
@@ -32,6 +34,9 @@ class PlacesList extends ConsumerWidget {
               itemCount: places.length,
               itemBuilder: (context, int index) {
                 return ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: FileImage(places[index].img),
+                  ),
                   onTap: () {
                     placeDetail(places[index]);
                   },

@@ -13,12 +13,16 @@ class NewPlace extends ConsumerStatefulWidget {
 class _NewPlaceState extends ConsumerState<NewPlace> {
   final formKey = GlobalKey<FormState>();
   var title;
+  var img;
   void saveTitle() {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
-      ref.read(placesProvider.notifier).addPlace(FavoritePlace(title: title));
-      Navigator.of(context).pop();
-      //print(title);
+      if (img != null) {
+        ref
+            .read(placesProvider.notifier)
+            .addPlace(FavoritePlace(title: title, img: img));
+        Navigator.of(context).pop();
+      }
     }
   }
 
@@ -44,10 +48,9 @@ class _NewPlaceState extends ConsumerState<NewPlace> {
                   title = value;
                 },
                 decoration: const InputDecoration(label: Text('Title')),
-                //validator: (){},
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a title';
+                  if (value == null || value.isEmpty || img == null) {
+                    return 'Please enter the inputs';
                   }
                   return null;
                 },
@@ -55,9 +58,13 @@ class _NewPlaceState extends ConsumerState<NewPlace> {
             ),
           ),
           const SizedBox(height: 10),
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: ImageInput(),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ImageInput(
+              selectedImg: (image) {
+                img = image;
+              },
+            ),
           ),
           const SizedBox(height: 5),
           ElevatedButton.icon(

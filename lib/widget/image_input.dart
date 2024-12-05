@@ -1,10 +1,10 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImageInput extends StatefulWidget {
-  const ImageInput({super.key});
+  const ImageInput({super.key, required this.selectedImg});
+  final void Function(File img) selectedImg;
 
   @override
   State<ImageInput> createState() {
@@ -15,13 +15,13 @@ class ImageInput extends StatefulWidget {
 class _ImageInputState extends State<ImageInput> {
   var img;
   void _takePicture() async {
-    final takenImage = await ImagePicker()
-        .pickImage(source: ImageSource.camera, maxWidth: 600);
-    setState(() {
-      if (takenImage != null) {
-        img = File(takenImage.path);
-      }
-    });
+    var takenImg = await ImagePicker().pickImage(source: ImageSource.camera);
+    if (takenImg != null) {
+      setState(() {
+        img = File(takenImg.path);
+        widget.selectedImg(img);
+      });
+    }
   }
 
   @override
@@ -29,7 +29,7 @@ class _ImageInputState extends State<ImageInput> {
     Widget body = img != null
         ? GestureDetector(
             onTap: _takePicture,
-            child: Image.file(img, fit: BoxFit.cover),
+            child: Image.file(img, fit: BoxFit.cover, width: double.infinity),
           )
         : ElevatedButton.icon(
             onPressed: _takePicture,

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:favorite_places/models/favorite_place.dart';
 import 'package:flutter/material.dart';
 
@@ -15,8 +17,10 @@ class PlaceDetails extends StatelessWidget {
           title: const Text('Place detail'),
         ),
         body: Center(
-            child: Text(place.title,
-                style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface))));
+            child: Stack(
+          children: [
+            Image.file(place.img, fit: BoxFit.cover, width: double.infinity)
+          ],
+        )));
   }
 }
