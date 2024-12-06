@@ -1,6 +1,7 @@
 import 'package:favorite_places/models/favorite_place.dart';
 import 'package:favorite_places/providers/places_provider.dart';
 import 'package:favorite_places/widget/image_input.dart';
+import 'package:favorite_places/widget/location_input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -65,6 +66,10 @@ class _NewPlaceState extends ConsumerState<NewPlace> {
                 img = image;
               },
             ),
+          ),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: LocationInput(),
           ),
           const SizedBox(height: 5),
           ElevatedButton.icon(
