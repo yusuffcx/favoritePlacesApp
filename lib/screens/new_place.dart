@@ -13,15 +13,15 @@ class NewPlace extends ConsumerStatefulWidget {
 
 class _NewPlaceState extends ConsumerState<NewPlace> {
   final formKey = GlobalKey<FormState>();
+  var location;
   var title;
   var img;
   void saveTitle() {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
       if (img != null) {
-        ref
-            .read(placesProvider.notifier)
-            .addPlace(FavoritePlace(title: title, img: img));
+        ref.read(placesProvider.notifier).addPlace(
+            FavoritePlace(title: title, img: img, location: location));
         Navigator.of(context).pop();
       }
     }
@@ -67,9 +67,13 @@ class _NewPlaceState extends ConsumerState<NewPlace> {
               },
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: LocationInput(),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: LocationInput(
+              onSelectedLocation: (loc) {
+                location = loc;
+              },
+            ),
           ),
           const SizedBox(height: 5),
           ElevatedButton.icon(

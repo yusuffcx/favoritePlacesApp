@@ -11,9 +11,11 @@ class PlaceLocation {
 }
 
 class FavoritePlace {
-  FavoritePlace({required this.img, required this.title})
+  FavoritePlace(
+      {required this.img, required this.title, required this.location})
       : id = const Uuid().v4();
   final String id;
   final String title;
   final File img;
+  final PlaceLocation location;
 }

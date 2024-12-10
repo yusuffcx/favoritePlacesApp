@@ -5,7 +5,8 @@ import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
 
 class LocationInput extends StatefulWidget {
-  const LocationInput({super.key});
+  const LocationInput({super.key, required this.onSelectedLocation});
+  final void Function(PlaceLocation location) onSelectedLocation;
 
   @override
   State<LocationInput> createState() {
@@ -55,13 +56,20 @@ class _LocationInputState extends State<LocationInput> {
     var url = Uri.parse(
         'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=AIzaSyAzpUXdswADNpnJ_8iUhaJViA9KNH2R6as');
     var resp = await http.get(url);
-    print(resp);
-    print(resp.body);
+    //print(resp);
+    //print(resp.body);
 
     var data = json.decode(resp.body);
 
-    var address = data["results"][0];
-    print(address);
+    var address = data["results"][0]['formatted_address'];
+    print(resp.body);
+
+    if (lat == null || lng == null) {
+      return;
+    } else {
+      widget.onSelectedLocation(
+          PlaceLocation(longitude: lng, latitude: lat, address: address));
+    }
 
     map = Image.network(
         'https://maps.googleapis.com/maps/api/staticmap?center=$lat,$lng&zoom=16&size=400x400&markers=color:red%7Clabel:G%7C$lat,$lng&maptype=roadmap&key=AIzaSyAzpUXdswADNpnJ_8iUhaJViA9KNH2R6as',

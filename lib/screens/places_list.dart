@@ -43,6 +43,7 @@ class PlacesList extends ConsumerWidget {
                   title: Text(
                     places[index].title,
                   ),
+                  subtitle: Text(places[index].location.address),
                 );
               },
             ),
