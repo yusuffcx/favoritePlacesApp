@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:favorite_places/models/favorite_place.dart';
+import 'package:favorite_places/screens/map.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
 
@@ -15,9 +17,41 @@ class LocationInput extends StatefulWidget {
 }
 
 class _LocationInputState extends State<LocationInput> {
-  Widget? map;
+  //Widget? map;
   var gettingLoc = false;
-  var showMap = false;
+  var showMap =
+      false; // user get current location butonuna basarsa aktif olur ve ekranda seçtiği mapin resmi çıkar.
+  var lat;
+  var lng;
+  var CurLoc;
+
+  void savePlace(lat, lng) async {
+    var url = Uri.parse(
+        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=AIzaSyAzpUXdswADNpnJ_8iUhaJViA9KNH2R6as');
+    var resp = await http.get(url);
+    //print(resp);
+    //print(resp.body);
+
+    var data = json.decode(resp.body);
+    print(resp);
+    print(resp.body);
+    print(data);
+
+    var address = data["results"][0]['formatted_address'];
+    print(resp.body);
+    print(address);
+
+    if (lat == null || lng == null) {
+      return;
+    } else {
+      CurLoc = PlaceLocation(longitude: lng, latitude: lat, address: address);
+      widget.onSelectedLocation(CurLoc);
+    }
+    setState(() {
+      gettingLoc = false;
+      showMap = true;
+    });
+  }
 
   void getCurrentLocation() async {
     Location location = Location();
@@ -44,15 +78,17 @@ class _LocationInputState extends State<LocationInput> {
 
     setState(() {
       gettingLoc = true;
-      showMap = true;
     });
 
     locationData = await location.getLocation();
-    final lat = locationData.latitude;
-    final lng = locationData.longitude;
+    lat = locationData.latitude;
+    lng = locationData.longitude;
 
     print(locationData.latitude);
     print(locationData.longitude);
+
+    savePlace(lat, lng);
+    /*
     var url = Uri.parse(
         'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=AIzaSyAzpUXdswADNpnJ_8iUhaJViA9KNH2R6as');
     var resp = await http.get(url);
@@ -67,19 +103,43 @@ class _LocationInputState extends State<LocationInput> {
     if (lat == null || lng == null) {
       return;
     } else {
-      widget.onSelectedLocation(
-          PlaceLocation(longitude: lng, latitude: lat, address: address));
+      CurLoc = PlaceLocation(longitude: lng, latitude: lat, address: address);
+      widget.onSelectedLocation(CurLoc);
     }
-
+*/
+/*
     map = Image.network(
         'https://maps.googleapis.com/maps/api/staticmap?center=$lat,$lng&zoom=16&size=400x400&markers=color:red%7Clabel:G%7C$lat,$lng&maptype=roadmap&key=AIzaSyAzpUXdswADNpnJ_8iUhaJViA9KNH2R6as',
         fit: BoxFit.cover,
         width: double.infinity,
-        height: double.infinity);
+        height: double.infinity);*/
+  }
 
-    setState(() {
-      gettingLoc = false;
-    });
+  Widget get map {
+    return Image.network(
+        'https://maps.googleapis.com/maps/api/staticmap?center=$lat,$lng&zoom=16&size=400x400&markers=color:red%7Clabel:G%7C$lat,$lng&maptype=roadmap&key=AIzaSyAzpUXdswADNpnJ_8iUhaJViA9KNH2R6as',
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity);
+  }
+
+  void selectOnMap() async {
+    final selectedLoc = await Navigator.of(context).push<LatLng>(
+        MaterialPageRoute(
+            builder: (ctx) => const MapScreen(isSelected: false)));
+
+    if (selectedLoc == null) {
+      return;
+    } else {
+      setState(() {
+        lat = selectedLoc.latitude;
+        lng = selectedLoc.longitude;
+        gettingLoc = false;
+        showMap = true;
+        // map;
+        savePlace(lat, lng);
+      });
+    }
   }
 
   @override
@@ -122,7 +182,7 @@ class _LocationInputState extends State<LocationInput> {
                     onPressed: getCurrentLocation,
                     label: const Text('Get Current Location')),
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: selectOnMap,
                   label: const Text('Select on Map'),
                   icon: const Icon(Icons.map),
                 )
